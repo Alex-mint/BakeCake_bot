@@ -1,4 +1,0 @@
-
-
-print('fdfd')
-print('fdf')
