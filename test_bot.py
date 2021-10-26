@@ -13,7 +13,7 @@ logging.basicConfig(
     level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-MENU, LEVELS, FORM = range(3)
+MENU, LEVELS, FORM, TOPPING, BERRIES, DECOR = range(6)
 
 TG_TOKEN = 'token'
 
@@ -106,7 +106,7 @@ def form(update, context):
         return MENU
     if user_message in context.user_data.get('form_buttons'):
         price = bottons_parser(user_message)
-        context.user_data['bc_form'] = user_message.split()[0]
+        context.user_data['bc_form'] = user_message.split('(')[0].strip()
         context.user_data['price'] = int(price[0])
         print(user_message.split()[0], price[0])
         buttons = ['Без топпинга (+0)', 'Белый соус (+200)',
@@ -118,15 +118,82 @@ def form(update, context):
         time.sleep(0.5)
         update.message.reply_text('Топпинг (Обязательное поле)',
                                   reply_markup=topping_markup)
-        return FORM
+        return TOPPING
     else:
         pass
 
 
+def topping(update, context):
+    user_message = update.message.text
+    if user_message == 'Вернулся в меню':
+        update.message.reply_text('Меню', reply_markup=menu_markup)
+        return MENU
+    if user_message in context.user_data.get('topping_buttons'):
+        price = bottons_parser(user_message)
+        context.user_data['bc_topping'] = user_message.split('(')[0].strip()
+        context.user_data['price'] = int(price[0])
+        print(user_message.split('(')[0].strip(), price[0])
+        buttons = ['Без ягод (+0)', 'Ежевика (+400)',
+                   'Малина (+300)', 'Голубика (+450)',
+                   'Клубника (+500)', 'Вернулся в меню']
+        context.user_data['berries_buttons'] = buttons[:-1]
+        berries_markup = keyboard_maker(buttons, 2)
+        time.sleep(0.5)
+        update.message.reply_text('Ягоды (Не обязательное для заполнения поле)',
+                                  reply_markup=berries_markup)
+        return BERRIES
+    else:
+        pass
 
 
+def berries(update, context):
+    user_message = update.message.text
+    if user_message == 'Вернулся в меню':
+        update.message.reply_text('Меню', reply_markup=menu_markup)
+        return MENU
+    if user_message in context.user_data.get('berries_buttons'):
+        price = bottons_parser(user_message)
+        context.user_data['bc_berries'] = user_message.split('(')[0].strip()
+        context.user_data['price'] = int(price[0])
+        print(user_message.split('(')[0].strip(), price[0])
+        buttons = ['Без ягод (+0)', 'Фисташки (+300)',
+                   'Безе (+400)', 'Фундук (+350)',
+                   'Пекан (+300)', 'Маршмеллоу (+200)',
+                   'Вернулся в меню']
+        context.user_data['decor_buttons'] = buttons[:-1]
+        berrie_markup = keyboard_maker(buttons, 2)
+        time.sleep(0.5)
+        update.message.reply_text('Декор (Не обязательное поле)',
+                                  reply_markup=berrie_markup)
+        return DECOR
+    else:
+        pass
 
 
+def decor(update, context):
+    user_message = update.message.text
+    if user_message == 'Вернулся в меню':
+        update.message.reply_text('Меню', reply_markup=menu_markup)
+        return MENU
+    if user_message in context.user_data.get('decor_buttons'):
+        price = bottons_parser(user_message)
+        context.user_data['bc_decor'] = user_message.split('(')[0].strip()
+        context.user_data['price'] = int(price[0])
+        print(user_message.split('(')[0].strip(), price[0])
+        buttons = ['Без ягод (+0)', 'Фисташки (+300)',
+                   'Безе (+400)', 'Фундук (+350)',
+                   'Пекан (+300)', 'Маршмеллоу (+200)',
+                   'Вернулся в меню']
+        context.user_data['berries_buttons'] = buttons[:-1]
+        berrie_markup = keyboard_maker(buttons, 2)
+        time.sleep(0.5)
+        update.message.reply_text('Надпись (Не обязательное поле)')
+        time.sleep(0.5)
+        update.message.reply_text('Мы можем разместить на торте любую надпись, например: «С днем рождения!»',
+                                  reply_markup=berrie_markup)
+        #return DECOR
+    else:
+        pass
 
 
 def cancel(update, _):
@@ -154,6 +221,15 @@ def main():
 
             FORM: [CommandHandler('start', start),
                      MessageHandler(Filters.text, form)],
+
+            TOPPING: [CommandHandler('start', start),
+                      MessageHandler(Filters.text, topping)],
+
+            BERRIES: [CommandHandler('start', start),
+                      MessageHandler(Filters.text, berries)],
+
+            DECOR: [CommandHandler('start', start),
+                      MessageHandler(Filters.text, decor)],
 
         },
 
