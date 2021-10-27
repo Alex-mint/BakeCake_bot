@@ -322,6 +322,7 @@ def order(update, context):
         first_name = context.user_data.get('first_name')
         last_name = context.user_data.get('last_name')
         username = context.user_data.get('username')
+        phone = context.user_data.get('phone')
 
         total_levels = context.user_data.get('total_levels')
         bc_form = context.user_data.get('bc_form')
